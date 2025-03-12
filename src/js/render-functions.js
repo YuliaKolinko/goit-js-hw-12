@@ -20,7 +20,6 @@ export function refreshLightbox() {
   lightbox.refresh();
 }
 export function renderImages(images) {
-  console.log('Дані для рендерингу:', images); // Додано для перевірки даних
   const gallery = document.querySelector('.gallery');
   const galleryArray = images.map(image => {
     const {

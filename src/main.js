@@ -22,7 +22,7 @@ const errorMesage = {
   message:
     'Sorry, there are no images matching your search query.Please try again!',
   messageColor: '#fff',
-  backgroundColor: '#ef4040',
+  backgroundColor: '#ffa000',
   position: 'topRight',
   iconUrl: iconSvgError,
 };
@@ -38,12 +38,13 @@ form.addEventListener('submit', searchImages);
 loadMoreBtn.addEventListener('click', loadMoreImages);
 let totalHits = 0;
 let loadedImages = 0;
+let query = '';
 // Обробляємо подію відправки форми, та відображаємо знайдені зображення в галереї
-function searchImages(event) {
+async function searchImages(event) {
   // Відміняємо дію за замовченням
   event.preventDefault();
   // Перевірка введеного тексту
-  const query = event.currentTarget.elements.searchQuery.value.trim();
+  query = event.currentTarget.elements.searchQuery.value.trim();
   if (!query) {
     return;
   }
@@ -57,59 +58,54 @@ function searchImages(event) {
   resetPage();
   // Виконуємо запит на сервер
   loadedImages = 0;
-  responseData(query)
-    .then(data => {
-      const images = data.hits;
-      totalHits = data.hits; // Зберігаємо загальну кількість зображень
-      loadedImages = images.length; // Зберігаємо кількість завантажених зображень
-      if (images.length === 0) {
-        iziToast.show(errorMesage);
-        return;
-      }
-      // Додаємо знайдені зображення в галерею
-      renderImages(data.hits);
-      refreshLightbox();
-      if (loadedImages >= totalHits) {
-        // Перевірка на кінець колекції
-        iziToast.show(endOfSearch);
-        loadMoreBtn.classList.add('visually-hidden');
-      } else {
-        loadMoreBtn.classList.remove('visually-hidden');
-      }
-    })
-    //  Обробляємо помилки
-    .catch(error => {
+  try {
+    const data = await responseData(query);
+    const images = data.hits;
+    totalHits = data.totalHits; // Зберігаємо загальну кількість зображень
+    loadedImages = images.length; // Зберігаємо кількість завантажених зображень
+    if (images.length === 0) {
       iziToast.show(errorMesage);
-    })
+      return;
+    }
+    // Додаємо знайдені зображення в галерею
+    renderImages(data.hits);
+    refreshLightbox();
+    if (loadedImages >= totalHits) {
+      // Перевірка на кінець колекції
+      iziToast.show(endOfSearch);
+      loadMoreBtn.classList.add('visually-hidden');
+    } else {
+      loadMoreBtn.classList.remove('visually-hidden');
+    }
+  } catch (error) {
+    iziToast.show(errorMesage);
+  } finally {
     // Ховаємо лоадер
-    .finally(() => {
-      loaderElement.classList.add('visually-hidden');
-    });
+    loaderElement.classList.add('visually-hidden');
+  }
 }
-function loadMoreImages() {
-  const query = form.elements.searchQuery.value.trim();
+async function loadMoreImages() {
+  // const query = form.elements.searchQuery.value.trim();
   loaderElement.classList.remove('visually-hidden');
-  responseData(query)
-    .then(data => {
-      const images = data.hits;
-      loadedImages += images.length;
-      if (images.length === 0) {
-        iziToast.show(errorMesage);
-        loadMoreBtn.classList.add('visually-hidden'); // Ховаємо кнопку "Load more" якщо більше немає зображень
-        return;
-      }
-      renderImages(data.hits);
-      refreshLightbox();
-      if (loadedImages >= totalHits) {
-        // Перевірка на кінець колекції
-        iziToast.show(endOfSearch);
-        loadMoreBtn.classList.add('visually-hidden');
-      }
-    })
-    .catch(error => {
+  try {
+    const data = await responseData(query);
+    const images = data.hits;
+    loadedImages += images.length;
+    if (images.length === 0) {
       iziToast.show(errorMesage);
-    })
-    .finally(() => {
-      loaderElement.classList.add('visually-hidden');
-    });
+      loadMoreBtn.classList.add('visually-hidden'); // Ховаємо кнопку "Load more" якщо більше немає зображень
+      return;
+    }
+    renderImages(data.hits);
+    refreshLightbox();
+    if (loadedImages >= totalHits) {
+      // Перевірка на кінець колекції
+      iziToast.show(endOfSearch);
+      loadMoreBtn.classList.add('visually-hidden');
+    }
+  } catch (error) {
+    iziToast.show(errorMesage);
+  } finally {
+    loaderElement.classList.add('visually-hidden');
+  }
 }
