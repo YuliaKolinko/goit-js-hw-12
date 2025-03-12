@@ -22,7 +22,7 @@ const errorMesage = {
   message:
     'Sorry, there are no images matching your search query.Please try again!',
   messageColor: '#fff',
-  backgroundColor: '#ffa000',
+  backgroundColor: '#ef4040',
   position: 'topRight',
   iconUrl: iconSvgError,
 };
