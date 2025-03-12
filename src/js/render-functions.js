@@ -1,3 +1,24 @@
+// SimpleLightbox імпорт бібліотеки
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+let lightbox = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionsData: 'alt',
+  captionType: 'attr',
+  captionDelay: 250,
+  animationSpeed: 350,
+  captionPosition: 'bottom',
+});
+
+// lightbox.on('show.simplelightbox', function () {});
+// lightbox.on('error.simplelightbox', function (e) {
+//   console.log(e);
+// });
+
+// Функція для оновлення SimpleLightbox
+export function refreshLightbox() {
+  lightbox.refresh();
+}
 export function renderImages(images) {
   console.log('Дані для рендерингу:', images); // Додано для перевірки даних
   const gallery = document.querySelector('.gallery');
