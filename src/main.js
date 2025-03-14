@@ -65,6 +65,7 @@ async function searchImages(event) {
     loadedImages = images.length; // Зберігаємо кількість завантажених зображень
     if (images.length === 0) {
       iziToast.show(errorMesage);
+      loadMoreBtn.classList.add('visually-hidden'); // Ховаємо кнопку "Load more" якщо більше немає зображень
       return;
     }
     // Додаємо знайдені зображення в галерею
@@ -85,8 +86,8 @@ async function searchImages(event) {
   }
 }
 async function loadMoreImages() {
-  // const query = form.elements.searchQuery.value.trim();
   loaderElement.classList.remove('visually-hidden');
+  const galleryHeightBefore = gallery.scrollHeight;
   try {
     const data = await responseData(query);
     const images = data.hits;
@@ -98,6 +99,11 @@ async function loadMoreImages() {
     }
     renderImages(data.hits);
     refreshLightbox();
+    const galleryHeightAfter = gallery.scrollHeight;
+    window.scrollBy({
+      top: galleryHeightAfter - galleryHeightBefore,
+      behavior: 'smooth',
+    }); // Прокручуємо сторінку вниз на висоту новозавантажених елементів
     if (loadedImages >= totalHits) {
       // Перевірка на кінець колекції
       iziToast.show(endOfSearch);
